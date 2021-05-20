@@ -61,17 +61,21 @@ public class GrayGlobalFilter implements GlobalFilter, Ordered {
             for (LoadBalancerRule r:rules){
                 flag = ruleStrategyMap.get(getRuleName(r.getOperator())).isRoute(r,loginMap);
             }
+            //配置规则与对应的版本
+            String version = "1.0.0";
+            String lable = "normal";
             if(flag){
                 //配置规则与对应的版本
-                String version = "2.0";
-                String lable = "gray";
-                GrayHolder.initHystrixRequestContext(lable,version);
+                version = "2.0";
+                lable = "gray";
                 ServerHttpRequest request = exchange.getRequest().mutate()
                         .header(GrayHolder.VERSION_KEY, version)
                         .header(GrayHolder.LABEL_KEY,lable)
                         .build();
                 return chain.filter(exchange.mutate().request(request).build());
             }
+            //不管是灰度还是普通环境都必须初始化标签，要不然会报错
+            GrayHolder.initHystrixRequestContext(lable,version);
         }
         return chain.filter(exchange.mutate().build());
     }

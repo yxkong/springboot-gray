@@ -29,10 +29,14 @@ public class LableRule  extends AbstractLoadBalancerRule {
     private static Logger log = LoggerFactory.getLogger(LableRule.class);
     public static final String META_DATA_KEY_VERSION = "version";
     public static final String META_DATA_KEY_WEIGHT = "weight";
+    //普通server轮训器
     private AtomicInteger nextServerCyclicCounter;
+    //灰度轮训器
+    private AtomicInteger nextGrayServerCyclicCounter;
 
     public LableRule() {
         nextServerCyclicCounter = new AtomicInteger(0);
+        nextGrayServerCyclicCounter = new AtomicInteger(0);
     }
 
     @Override
@@ -67,6 +71,11 @@ public class LableRule  extends AbstractLoadBalancerRule {
         }
         return Boolean.FALSE;
     }
+
+    /**
+     * 获取eureka中的 mateInfo信息
+     * @return
+     */
     private Pair<String,String> getMateInfo(){
         //拿到上下文中的版本
         String versionStr = StringUtils.isEmpty(GrayHolder.getVersion()) ?
@@ -77,6 +86,12 @@ public class LableRule  extends AbstractLoadBalancerRule {
         log.info("拿到上下文中的version是：{} label是：{}",versionStr,labelStr);
         return new Pair<>(versionStr,labelStr);
     }
+
+    /**
+     * 获取灰度server
+     * @param reachableServers
+     * @return
+     */
     private List<Server> getGrayServers(List<Server> reachableServers){
         Pair<String,String> mateInfo = getMateInfo();
         return reachableServers.stream().filter(server -> {
@@ -84,7 +99,23 @@ public class LableRule  extends AbstractLoadBalancerRule {
             if(mateInfo.getKey().equalsIgnoreCase(metadata.get(GrayHolder.VERSION_KEY))&& mateInfo.getValue().equalsIgnoreCase(metadata.get(GrayHolder.LABEL_KEY))){
                 return Boolean.TRUE;
             }
-            return false;
+            return Boolean.FALSE;
+        }).collect(Collectors.toList());
+    }
+
+    /**
+     * 排除灰度服务器
+     * @param reachableServers
+     * @return
+     */
+    private List<Server> getExcludeGrayServers(List<Server> reachableServers){
+        Pair<String,String> mateInfo = getMateInfo();
+        return reachableServers.stream().filter(server -> {
+            Map<String, String> metadata = ((DiscoveryEnabledServer) server).getInstanceInfo().getMetadata();
+            if(mateInfo.getKey().equalsIgnoreCase(metadata.get(GrayHolder.VERSION_KEY))&& mateInfo.getValue().equalsIgnoreCase(metadata.get(GrayHolder.LABEL_KEY))){
+                return Boolean.FALSE;
+            }
+            return Boolean.TRUE;
         }).collect(Collectors.toList());
     }
     private Server chooseServer(ILoadBalancer lb,Boolean isGray){
@@ -105,21 +136,27 @@ public class LableRule  extends AbstractLoadBalancerRule {
             if (allServers.size() == 1) {
                 return allServers.get(0);
             }
+            int nextServerIndex = 0;
             //灰度环境重新计算allServers 和serverCount
+            AtomicInteger counter = null;
             if(isGray){
                 allServers = getGrayServers(allServers);
-                //获取不到就直接返回null
-                if(Objects.isNull(allServers)|| allServers.size()==0){
-                    return null;
-                }
-                if (allServers.size() == 1) {
-                    return allServers.get(0);
-                }
-                serverCount = allServers.size();
-            }
+                counter = nextGrayServerCyclicCounter;
+            }else {
+                allServers = getExcludeGrayServers(allServers);
+                counter = nextServerCyclicCounter;
 
+            }
+            //获取不到就直接返回null
+            if(Objects.isNull(allServers)|| allServers.size()==0){
+                return null;
+            }
+            if (allServers.size() == 1) {
+                return allServers.get(0);
+            }
+            serverCount = allServers.size();
             //轮训算法，是在单机里维护了一个AtomicInteger，不断自增取模server的数量
-            int nextServerIndex = incrementAndGetModulo(serverCount);
+            nextServerIndex = incrementAndGetModulo(counter,serverCount);
             server = allServers.get(nextServerIndex);
 
             if (server == null) {
@@ -131,7 +168,6 @@ public class LableRule  extends AbstractLoadBalancerRule {
             if (server.isAlive() && (server.isReadyToServe())) {
                 return (server);
             }
-
             // Next.
             server = null;
         }
@@ -149,12 +185,13 @@ public class LableRule  extends AbstractLoadBalancerRule {
      * @param modulo The modulo to bound the value of the counter.
      * @return The next value.
      */
-    private int incrementAndGetModulo(int modulo) {
+    private int incrementAndGetModulo(AtomicInteger counter,int modulo) {
         for (;;) {
-            int current = nextServerCyclicCounter.get();
+            int current = counter.get();
             int next = (current + 1) % modulo;
-            if (nextServerCyclicCounter.compareAndSet(current, next))
+            if (counter.compareAndSet(current, next)){
                 return next;
+            }
         }
     }
 

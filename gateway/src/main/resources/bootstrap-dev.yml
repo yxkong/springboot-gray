@@ -1,0 +1,67 @@
+server:
+  port: 9000
+
+#还可以②jar包启动得时候在命令行中指定 -Dspring.profiles.active=dev ③.在IDE中指定
+logging:
+  level:
+    root: info
+  config: classpath:log4j2/log4j2-dev.xml
+eureka:
+  server:
+    #当Eureka Server节点在短时间内丢失过多的客户端时（可能发送了网络故障），那么这个节点将进入自我保护模式，不再注销任何微服务，当网络故障回复后，该节点会自动退出自我保护模式
+    enable-self-preservation: false
+    #清理间隔,没有及时下线，利用这个比较好（单位毫秒，默认是60*1000）
+    evictionIntervalTimerInMs: 2000
+  client:
+    #    register-with-eureka: true
+    #    fetch-registry: false
+    healthcheck:
+      #开启健康检查
+      enabled: true
+    service-url:
+      defaultZone: http://127.0.0.1:8765/eureka/
+  instance:
+    hostname: ${spring.application.name}
+    #指定本节点的IP
+    #ip-address: 127.0.0.1
+    #表示使用IP进行配置
+    prefer-ip-address: true
+    instance-id: ${spring.cloud.client.ip-address}:${spring.application.name}:${server.port}
+    #租期更新时间间隔（默认30秒）
+    lease-renewal-interval-in-seconds: 10
+    #租期到期时间（默认90秒）
+    lease-expiration-duration-in-seconds: 10
+    metadata-map:
+      version: 1.0.0
+      lable: dev
+spring:
+  cloud:
+    gateway:
+      routes:
+        # 转到api处理
+        - id: route_to_api
+          #转发路径，可以是eureka的服务名，也可以是具体的请求域名
+          uri: lb://DEMO-API
+          #映射（重定向）规则
+          filters:
+          - RewritePath=/api/demo/hello,/demo/hello
+          - RewritePath=/api/(?<segment>.*),/$\{segment}
+          #predicates: 条件,用于请求网关路径的匹配规则
+          predicates:
+          - Path=/api/**
+        # 转到service
+        - id: route_to_service
+          uri: lb://DEMO-SERVICE
+          filters:
+          - RewritePath=/service/demo/hello,/demo/hello
+          predicates:
+          - Path=/service/**
+
+gateway:
+  auth:
+    exclude:
+      hosts:
+        - 192.168.1.106
+      urls:
+        - /discovery/list
+        - /discovery/info

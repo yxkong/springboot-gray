@@ -1,0 +1,45 @@
+server:
+  port: 9012
+spring :
+  tomcat:
+    uri-encoding: UTF-8
+    accept-count: 100
+    max-connections: 200
+    threads:
+      max: 100
+      minSpare: 10
+    connectionTimeout: 5000
+  compression:
+    enabled: true
+  # 开启优雅停机kill -2 可以优雅停机
+  shutdown: graceful
+logging:
+  config: classpath:log4j2/log4j2-dev.xml
+eureka:
+  server:
+    #当Eureka Server节点在短时间内丢失过多的客户端时（可能发送了网络故障），那么这个节点将进入自我保护模式，不再注销任何微服务，当网络故障回复后，该节点会自动退出自我保护模式
+    enable-self-preservation: false
+    #清理间隔,没有及时下线，利用这个比较好（单位毫秒，默认是60*1000）
+    evictionIntervalTimerInMs: 2000
+  client:
+#    register-with-eureka: true
+#    fetch-registry: false
+    healthcheck:
+      #开启健康检查
+      enabled: true
+    service-url:
+      defaultZone: http://127.0.0.1:8765/eureka/
+  instance:
+    hostname: ${spring.application.name}
+    #指定本节点的IP
+    #ip-address: 127.0.0.1
+    #表示使用IP进行配置
+    prefer-ip-address: true
+    instance-id: ${spring.cloud.client.ip-address}:${spring.application.name}:${server.port}
+    #租期更新时间间隔（默认30秒）
+    lease-renewal-interval-in-seconds: 10
+    #租期到期时间（默认90秒）
+    lease-expiration-duration-in-seconds: 10
+    metadata-map:
+      version: 1.0.0
+      label: dev

@@ -1,0 +1,16 @@
+server:
+  port: 9000
+spring:
+  profiles:
+    active: dev   # 指定启动环境  
+  application:
+    name: demo-gateway
+#management:
+#  endpoint:
+#    health:
+#      show-details: always
+#      group:
+#        exclude: health,info
+#      status:
+#        http-mapping: {'UP':200}
+

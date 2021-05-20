@@ -25,8 +25,8 @@ import java.util.stream.Collectors;
  * @Date: 2021/5/17 3:11 下午
  * @version: 1.0
  */
-public class LableRule  extends AbstractLoadBalancerRule {
-    private static Logger log = LoggerFactory.getLogger(LableRule.class);
+public class LabelRule  extends AbstractLoadBalancerRule {
+    private static Logger log = LoggerFactory.getLogger(LabelRule.class);
     public static final String META_DATA_KEY_VERSION = "version";
     public static final String META_DATA_KEY_WEIGHT = "weight";
     //普通server轮训器
@@ -34,7 +34,7 @@ public class LableRule  extends AbstractLoadBalancerRule {
     //灰度轮训器
     private AtomicInteger nextGrayServerCyclicCounter;
 
-    public LableRule() {
+    public LabelRule() {
         nextServerCyclicCounter = new AtomicInteger(0);
         nextGrayServerCyclicCounter = new AtomicInteger(0);
     }

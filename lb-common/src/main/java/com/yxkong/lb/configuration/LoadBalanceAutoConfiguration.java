@@ -2,11 +2,10 @@ package com.yxkong.lb.configuration;
 
 import com.netflix.loadbalancer.IRule;
 import com.yxkong.common.constant.Constants;
-import com.yxkong.lb.LableRule;
+import com.yxkong.lb.LabelRule;
 import com.yxkong.lb.interceptor.GrayRequestInterceptor;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.cloud.netflix.eureka.EurekaInstanceConfigBean;
 import org.springframework.cloud.netflix.ribbon.eureka.EurekaRibbonClientConfiguration;
@@ -28,7 +27,7 @@ import org.springframework.web.client.RestTemplate;
 public class LoadBalanceAutoConfiguration {
     @Bean
     public IRule ribbonRule() {
-        return  new LableRule();
+        return  new LabelRule();
     }
     @Bean
     public ClientHttpRequestFactory simpleClientHttpRequestFactory() {

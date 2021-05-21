@@ -178,13 +178,6 @@ public class LabelRule  extends AbstractLoadBalancerRule {
         }
         return server;
     }
-
-    /**
-     * Inspired by the implementation of {@link AtomicInteger#incrementAndGet()}.
-     *
-     * @param modulo The modulo to bound the value of the counter.
-     * @return The next value.
-     */
     private int incrementAndGetModulo(AtomicInteger counter,int modulo) {
         for (;;) {
             int current = counter.get();

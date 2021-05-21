@@ -69,13 +69,36 @@ java -jar -Dspring.profiles.active=gray service-1.0.jar
 ### 项目部署与调用情况
 ![img.png](doc/img.png)
 
+![img.png](doc/eureka.png)
+
 ### 调用请求
 查看eureka元数据
 ```shell
 curl http://127.0.0.1:8765/eureka/apps/
 ```
-请求直接由网关转发到service
+请求直接由网关路由到灰度到service
 ```shell
-curl http://127.0.0.1:8765/eureka/apps/
-```
+# 灰度用户
+curl  'http://127.0.0.1:9000/service/demo/hello' --header 'token: a'  --header 'Content-Type: application/json'
+#返回结果
+{"message":"执行成功！","status":"1","data":"service进入的版本号是：2.0","timestamp":1621607340919}
+# 非灰用户
+curl  'http://127.0.0.1:9000/service/demo/hello' --header 'token: abc'  --header 'Content-Type: application/json'
+{"message":"执行成功！","status":"1","data":"service进入的版本号是：","timestamp":1621611780692}
 
+
+```
+请求直接由网关转发到api再路由到service
+
+```shell
+# 灰度用户
+curl  'http://127.0.0.1:9000/api/demo/hello' --header 'token: a'  --header 'Content-Type: application/json'
+
+{"message":"执行成功！","status":"1","data":"service进入的版本号是：2.0","timestamp":1621611879941}
+# 非灰用户
+curl  'http://127.0.0.1:9000/api/demo/hello' --header 'token: abc'  --header 'Content-Type: application/json'
+#返回结果
+{"message":"执行成功！","status":"1","data":"service进入的版本号是：","timestamp":1621611645354}
+
+
+```

@@ -1,18 +1,24 @@
 package com.yxkong.common.utils;
 
+import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
 /**
+ * 注意此类使用必须先注入applicationContext
  * @Author: yxkong
  * @Date: 2021/5/17 3:40 下午
  * @version: 1.0
  */
-public class ApplicationContextHolder {
+@Component
+public class ApplicationContextHolder implements ApplicationContextAware {
     private static ApplicationContext applicationContext;
 
-    public static void setApplicationContext(ApplicationContext applicationContext) {
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         ApplicationContextHolder.applicationContext = applicationContext;
     }
 

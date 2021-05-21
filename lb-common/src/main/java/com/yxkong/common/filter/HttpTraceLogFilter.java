@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
  * @version: 1.0
  */
 public class HttpTraceLogFilter extends OncePerRequestFilter implements Ordered {
-    private Logger log = LoggerFactory.getLogger(HttpTraceLogFilter.class);
+    private static Logger log = LoggerFactory.getLogger(HttpTraceLogFilter.class);
     // 需要过滤掉的静态文件
     private static final Set<String> EXCLUDE_URI_SET = Sets.newHashSet(
             "actuator/prometheus",

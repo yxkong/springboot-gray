@@ -46,45 +46,45 @@ public class GrayGlobalFilter implements GlobalFilter, Ordered {
             e.printStackTrace();
         }
         //配置规则与对应的版本
-        String version = "1.0.0";
-        String lable = "normal";
-        try {
-            Map<String,String> loginMap = FastJsonUtils.fromJson(info,new TypeReference<Map<String, String>>(){});
-            if(loginMap!= null && !loginMap.isEmpty()){
-                List<LoadBalancerRule> rules = getRules();
-                boolean flag = Boolean.FALSE;
-                /**
-                 * 这除规则可以利用表结构来配置化，这个规则，可能是多个字段的组合，也可能只是取模，
-                 * 固化一些规则，如：
-                 * 注册时间是指定时间的
-                 * 登录时间是指定时间的
-                 * userId取模,对应几个
-                 * 手机号尾号是
-                 * 手机号取模
-                 */
-                //只实现了并且的关系，只要有一个为false就不走灰度
-                for (LoadBalancerRule r:rules){
-                    flag = ruleStrategyMap.get(getRuleName(r.getOperator())).isRoute(r,loginMap);
-                }
-                if(flag){
-                    //配置规则与对应的版本
-                    version = "2.0";
-                    lable = "gray";
-                    ServerHttpRequest request = exchange.getRequest().mutate()
-                            .header(GrayHolder.VERSION_KEY, version)
-                            .header(GrayHolder.LABEL_KEY,lable)
-                            .build();
-                    return chain.filter(exchange.mutate().request(request).build());
-                }
+        //配置规则与对应的版本
+        String version = null;
+        String label = null;
+        Map<String,String> loginMap = FastJsonUtils.fromJson(info,new TypeReference<Map<String, String>>(){});
+        if(loginMap!= null && !loginMap.isEmpty()){
+            List<LoadBalancerRule> rules = getRules();
+            boolean flag = Boolean.FALSE;
+            /**
+             * 这除规则可以利用表结构来配置化，这个规则，可能是多个字段的组合，也可能只是取模，
+             * 固化一些规则，如：
+             * 注册时间是指定时间的
+             * 登录时间是指定时间的
+             * userId取模,对应几个
+             * 手机号尾号是
+             * 手机号取模
+             */
+            //只实现了并且的关系，只要有一个为false就不走灰度
+            for (LoadBalancerRule r:rules){
+                flag = ruleStrategyMap.get(getRuleName(r.getOperator())).isRoute(r,loginMap);
             }
-        }catch (Exception e){
-            log.error("builder gray is error",e);
-        }finally {
-            //不管是灰度还是普通环境都必须初始化标签，要不然在路由时获取标签会报错
-            GrayHolder.initHystrixRequestContext(lable,version);
+            if(flag){
+                //配置灰度的版本和标签
+                version = "2.0";
+                label = "gray";
+            }
         }
-        return chain.filter(exchange.mutate().build());
+        ServerHttpRequest request = exchange.getRequest().mutate()
+                .header(GrayHolder.VERSION_KEY, version)
+                .header(GrayHolder.LABEL_KEY,label)
+                .build();
+        GrayHolder.initHystrixRequestContext(label,version);
+        return chain.filter(exchange.mutate().request(request).build());
     }
+
+    /**
+     * 获取具体的策略名称
+     * @param opt
+     * @return
+     */
     private String getRuleName(String opt){
         return opt+"RuleStrategy";
     }

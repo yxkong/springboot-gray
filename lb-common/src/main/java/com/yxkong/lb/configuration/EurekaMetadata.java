@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
  * @Date: 2021/5/17 3:30 下午
  * @version: 1.0
  */
-@Configuration("eurekaMetadata")
+@Configuration
 @ConfigurationProperties(prefix = Constants.METADATA_MAP)
 public class EurekaMetadata {
     private String version;

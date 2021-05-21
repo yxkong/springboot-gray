@@ -50,41 +50,30 @@ public class LabelRule  extends AbstractLoadBalancerRule {
             return null;
         }
         Server server = null;
+        //是否灰度用户
         if(isGray()){
+            log.info("用户是一个灰度用户");
+            //选择灰度服务器
             server = chooseServer(lb,Boolean.TRUE);
             if(!Objects.isNull(server)){
                 return server;
             }
+            log.info("没有匹配到灰度服务器从非灰度服务器中随机挑选一个");
         }
         //如果灰度找不到就随机从非灰里找
         return chooseServer(lb,Boolean.FALSE);
     }
 
     /**
-     * 判断是否是灰度环境
+     * 判断是否是灰度用户
      * @return
      */
     private Boolean isGray(){
-        Pair<String,String> mateInfo=getMateInfo();
-        if(!StringUtils.isEmpty(mateInfo.getKey()) && ! StringUtils.isEmpty(mateInfo.getValue()) && GrayHolder.LABEL_VAL.equals(mateInfo.getValue())){
-            return Boolean.TRUE;
+        //有一个为空表示不是灰度用户
+        if (Objects.isNull(GrayHolder.getVersion()) || Objects.isNull(GrayHolder.getLable())) {
+            return Boolean.FALSE;
         }
-        return Boolean.FALSE;
-    }
-
-    /**
-     * 获取eureka中的 mateInfo信息
-     * @return
-     */
-    private Pair<String,String> getMateInfo(){
-        //拿到上下文中的版本
-        String versionStr = StringUtils.isEmpty(GrayHolder.getVersion()) ?
-                ApplicationContextHolder.getBean(EurekaMetadata.class).getVersion(): GrayHolder.getVersion() ;
-        //拿到对应的label标签
-        String labelStr = StringUtils.isEmpty(GrayHolder.getLable()) ?
-                ApplicationContextHolder.getBean(EurekaMetadata.class).getLabel(): GrayHolder.getLable() ;
-        log.info("拿到上下文中的version是：{} label是：{}",versionStr,labelStr);
-        return new Pair<>(versionStr,labelStr);
+        return Boolean.TRUE;
     }
 
     /**
@@ -93,10 +82,15 @@ public class LabelRule  extends AbstractLoadBalancerRule {
      * @return
      */
     private List<Server> getGrayServers(List<Server> reachableServers){
-        Pair<String,String> mateInfo = getMateInfo();
         return reachableServers.stream().filter(server -> {
             Map<String, String> metadata = ((DiscoveryEnabledServer) server).getInstanceInfo().getMetadata();
-            if(mateInfo.getKey().equalsIgnoreCase(metadata.get(GrayHolder.VERSION_KEY))&& mateInfo.getValue().equalsIgnoreCase(metadata.get(GrayHolder.LABEL_KEY))){
+
+            /**
+             * 到这里一定是灰度用户，上下文中一定有标签和版本
+             * 并且上下文中传递的值和eureka中的元数据相同，则为灰度环境
+             */
+            if (GrayHolder.getVersion().equalsIgnoreCase(metadata.get(GrayHolder.VERSION_KEY))
+                    && GrayHolder.getLable().equalsIgnoreCase(metadata.get(GrayHolder.LABEL_KEY))){
                 return Boolean.TRUE;
             }
             return Boolean.FALSE;
@@ -109,15 +103,23 @@ public class LabelRule  extends AbstractLoadBalancerRule {
      * @return
      */
     private List<Server> getExcludeGrayServers(List<Server> reachableServers){
-        Pair<String,String> mateInfo = getMateInfo();
         return reachableServers.stream().filter(server -> {
             Map<String, String> metadata = ((DiscoveryEnabledServer) server).getInstanceInfo().getMetadata();
-            if(mateInfo.getKey().equalsIgnoreCase(metadata.get(GrayHolder.VERSION_KEY))&& mateInfo.getValue().equalsIgnoreCase(metadata.get(GrayHolder.LABEL_KEY))){
-                return Boolean.FALSE;
+            //只要有一个是空，就认为是非灰服务器
+            if (Objects.isNull(metadata.get(GrayHolder.VERSION_KEY))
+                    || Objects.isNull(metadata.get(GrayHolder.LABEL_KEY))){
+                return Boolean.TRUE;
             }
-            return Boolean.TRUE;
+            return Boolean.FALSE;
         }).collect(Collectors.toList());
     }
+
+    /**
+     * 选择服务器
+     * @param lb
+     * @param isGray 是否挑选灰度服务器  true 是，false 否
+     * @return
+     */
     private Server chooseServer(ILoadBalancer lb,Boolean isGray){
         Server server = null;
         int count = 0;

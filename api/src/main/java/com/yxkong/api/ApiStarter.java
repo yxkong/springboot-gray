@@ -22,6 +22,7 @@ import org.springframework.context.annotation.Import;
 @EnableDiscoveryClient
 @EnableEurekaClient
 @EnableFeignClients(basePackages = {"com.yxkong.api"})
+//@ServletComponentScan(basePackages = {"com.yxkong"})
 @Import(EurekaMetadata.class)
 @RibbonClients(defaultConfiguration = LoadBalanceAutoConfiguration.class)
 public class ApiStarter {

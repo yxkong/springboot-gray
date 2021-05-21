@@ -2,8 +2,10 @@ package com.yxkong.lb.configuration;
 
 import com.netflix.loadbalancer.IRule;
 import com.yxkong.common.constant.Constants;
+import com.yxkong.common.utils.ApplicationContextHolder;
 import com.yxkong.lb.LabelRule;
 import com.yxkong.lb.interceptor.GrayRequestInterceptor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.cloud.client.discovery.DiscoveryClient;

@@ -32,8 +32,8 @@ eureka:
     #租期到期时间（默认90秒）
     lease-expiration-duration-in-seconds: 10
     metadata-map:
-      version: 1.0.0
-      lable: dev
+      version: null
+      lable: null
 spring:
   cloud:
     gateway:

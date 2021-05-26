@@ -58,7 +58,7 @@ public class LabelRule  extends AbstractLoadBalancerRule {
             if(!Objects.isNull(server)){
                 return server;
             }
-            log.info("没有匹配到灰度服务器从非灰度服务器中随机挑选一个");
+            log.info("没有匹配到灰度服务器将从非灰度服务器中随机挑选一个");
         }
         //如果灰度找不到就随机从非灰里找
         return chooseServer(lb,Boolean.FALSE);
@@ -134,9 +134,11 @@ public class LabelRule  extends AbstractLoadBalancerRule {
                 log.warn("No up servers available from load balancer: " + lb);
                 return null;
             }
-            // 如果在检索之前size =1 直接返回
-            if (allServers.size() == 1) {
-                return allServers.get(0);
+            if(!isGray){
+                // 如果在检索之前size =1 直接返回
+                if (allServers.size() == 1) {
+                    return allServers.get(0);
+                }
             }
             int nextServerIndex = 0;
             //灰度环境重新计算allServers 和serverCount

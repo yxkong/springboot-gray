@@ -11,6 +11,7 @@ import java.io.IOException;
 
 /**
  * 灰度拦截器，用于请求时将lable和version向下传递
+ * 默认使用的Default Client 内部是由httpConnection实现，不起作用
  * @Author: yxkong
  * @Date: 2021/5/17 3:57 下午
  * @version: 1.0

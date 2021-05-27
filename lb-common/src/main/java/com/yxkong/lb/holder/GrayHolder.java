@@ -18,6 +18,7 @@ public class GrayHolder {
     public static final String LABEL_KEY = "label";
     public static final String LABEL_VAL = "gray";
     public static final String VERSION_KEY = "version";
+    public static final String WEIGHT_KEY = "weight";
     public static final HystrixRequestVariableDefault<Map<String, String>> label = new HystrixRequestVariableDefault<>();
 
     /**

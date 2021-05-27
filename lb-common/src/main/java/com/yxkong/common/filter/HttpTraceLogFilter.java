@@ -115,7 +115,7 @@ public class HttpTraceLogFilter extends OncePerRequestFilter implements Ordered 
             traceLog.setStatus(status);
             traceLog.setRequestBody(getRequestBody(request));
             traceLog.setResponseBody(getResponseBody(response));
-            log.warn("Http trace log: {}", FastJsonUtils.toJson(traceLog));
+            log.info("Http trace log: {}", FastJsonUtils.toJson(traceLog));
             updateResponse(response);
         }
     }

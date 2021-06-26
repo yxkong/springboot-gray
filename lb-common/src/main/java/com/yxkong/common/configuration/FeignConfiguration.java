@@ -6,12 +6,6 @@ import feign.RequestInterceptor;
 import feign.RequestTemplate;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.context.request.RequestAttributes;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
-
-import javax.servlet.http.HttpServletRequest;
-import java.util.Objects;
 
 /**
  * feign拦截器
@@ -33,13 +27,8 @@ public class FeignConfiguration {
         return new RequestInterceptor(){
             @Override
             public void apply(RequestTemplate template) {
-                RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
-                if(!Objects.isNull(requestAttributes)){
-                    HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-                    template.header(GrayHolder.LABEL_KEY, request.getHeader(GrayHolder.LABEL_KEY));
-                    template.header(GrayHolder.VERSION_KEY, request.getHeader(GrayHolder.VERSION_KEY));
-                }
-
+                template.header(GrayHolder.LABEL_KEY, GrayHolder.getLable());
+                template.header(GrayHolder.VERSION_KEY, GrayHolder.getVersion());
             }
         };
     }

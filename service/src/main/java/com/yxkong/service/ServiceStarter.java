@@ -15,7 +15,7 @@ import org.springframework.context.annotation.Import;
  * @Date: 2021/5/11 1:44 下午
  * @version: 1.0
  */
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages={"com.yxkong"})
 @EnableDiscoveryClient
 @EnableEurekaClient
 @EnableFeignClients

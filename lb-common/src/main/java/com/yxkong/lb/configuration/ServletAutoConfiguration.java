@@ -37,12 +37,15 @@ public class ServletAutoConfiguration {
             return new HandlerInterceptor() {
                 @Override
                 public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+                    //SecurityContextHolder.clearContext();
+                    //SecurityContextHolder.setRequest(request);
                     GrayHolder.initHystrixRequestContext(request.getHeader(GrayHolder.LABEL_KEY),request.getHeader(GrayHolder.VERSION_KEY));
                     return true;
                 }
 
                 @Override
                 public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+                    //SecurityContextHolder.clearContext();
                     GrayHolder.shutdownHystrixRequestContext();
                 }
             };

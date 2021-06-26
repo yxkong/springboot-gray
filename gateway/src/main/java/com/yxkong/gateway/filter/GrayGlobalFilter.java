@@ -65,6 +65,9 @@ public class GrayGlobalFilter implements GlobalFilter, Ordered {
             //只实现了并且的关系，只要有一个为false就不走灰度
             for (LoadBalancerRule r:rules){
                 flag = ruleStrategyMap.get(getRuleName(r.getOperator())).isRoute(r,loginMap);
+                if (!flag){
+                    break;
+                }
             }
             if(flag){
                 //配置灰度的版本和标签

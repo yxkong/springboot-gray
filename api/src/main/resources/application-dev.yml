@@ -9,7 +9,7 @@ spring :
     connectionTimeout: 5000
   compression:
     enabled: true
-  # 开启优雅停机kill -2 可以优雅停机
+  # 开启优雅停机kill -2 或者控制台ctrl c可以优雅停机
   shutdown: graceful
 logging:
   config: classpath:log4j2/log4j2-dev.xml

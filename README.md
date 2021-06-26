@@ -79,7 +79,7 @@ curl http://127.0.0.1:8765/eureka/apps/
 请求直接由网关路由到灰度到service
 ```shell
 # 灰度用户
-curl  'http://127.0.0.1:9000/service/demo/hello' --header 'token: a'  --header 'Content-Type: application/json'
+curl  'http://127.0.0.1:9000/service/demo/hello' --header 'token: bcd'  --header 'Content-Type: application/json'
 #返回结果
 {"message":"执行成功！","status":"1","data":"service进入的版本号是：2.0","timestamp":1621607340919}
 # 非灰用户
@@ -92,7 +92,9 @@ curl  'http://127.0.0.1:9000/service/demo/hello' --header 'token: abc'  --header
 
 ```shell
 # 灰度用户
-curl  'http://127.0.0.1:9000/api/demo/hello' --header 'token: a'  --header 'Content-Type: application/json'
+curl  'http://127.0.0.1:9000/api/demo/hello' --header 'token: bcd'  --header 'Content-Type: application/json'
+
+curl  'http://127.0.0.1:9000/api/demo/restTemplate' --header 'token: bcd'  --header 'Content-Type: application/json'
 
 {"message":"执行成功！","status":"1","data":"service进入的版本号是：2.0","timestamp":1621611879941}
 # 非灰用户

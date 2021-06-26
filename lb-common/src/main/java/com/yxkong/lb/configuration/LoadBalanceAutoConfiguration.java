@@ -2,13 +2,12 @@ package com.yxkong.lb.configuration;
 
 import com.netflix.loadbalancer.IRule;
 import com.yxkong.common.constant.Constants;
-import com.yxkong.common.utils.ApplicationContextHolder;
 import com.yxkong.lb.LabelRule;
 import com.yxkong.lb.interceptor.GrayRequestInterceptor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
+import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.cloud.netflix.eureka.EurekaInstanceConfigBean;
 import org.springframework.cloud.netflix.ribbon.eureka.EurekaRibbonClientConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -40,6 +39,7 @@ public class LoadBalanceAutoConfiguration {
         return factory;
     }
     @Bean
+    @LoadBalanced
     public RestTemplate restTemplate(ClientHttpRequestFactory factory) {
         RestTemplate restTemplate = new RestTemplate(factory);
         restTemplate.getInterceptors().add(new GrayRequestInterceptor());

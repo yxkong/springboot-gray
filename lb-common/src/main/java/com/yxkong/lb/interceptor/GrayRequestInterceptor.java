@@ -20,7 +20,7 @@ public class GrayRequestInterceptor implements ClientHttpRequestInterceptor {
     @Override
     public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
         HttpRequestWrapper requestWrapper = new HttpRequestWrapper(request);
-        requestWrapper.getHeaders().add(GrayHolder.LABEL_KEY, GrayHolder.getLable());
+        requestWrapper.getHeaders().add(GrayHolder.LABEL_KEY,GrayHolder.getLable());
         requestWrapper.getHeaders().add(GrayHolder.VERSION_KEY, GrayHolder.getVersion());
         return execution.execute(requestWrapper, body);
     }

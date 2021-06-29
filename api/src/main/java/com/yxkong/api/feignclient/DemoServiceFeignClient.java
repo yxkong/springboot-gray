@@ -1,4 +1,4 @@
-package com.yxkong.api.feginclient;
+package com.yxkong.api.feignclient;
 
 import com.yxkong.common.dto.ResultBean;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
  * @version: 1.0
  */
 @FeignClient("demo-service")
-public interface DemoServiceFeginClient {
+public interface DemoServiceFeignClient {
     @RequestMapping(value = "/demo/hello",method = {RequestMethod.GET})
     ResultBean hello();
 

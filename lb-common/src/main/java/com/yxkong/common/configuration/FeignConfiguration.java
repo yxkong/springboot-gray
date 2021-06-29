@@ -6,8 +6,15 @@ import com.yxkong.lb.holder.GrayHolder;
 import feign.Logger;
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.converter.HttpMessageConverter;
+
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * feign拦截器
@@ -33,10 +40,17 @@ public class FeignConfiguration {
                  * 使用SecurityContextHolder，确保在启用线程池时，子线程feign也能获取到lable和version
                  */
                 final SecurityDTO dto = SecurityContextHolder.getSecurityDTO();
-                template.header(GrayHolder.LABEL_KEY, dto.getLabel());
-                template.header(GrayHolder.VERSION_KEY, dto.getVersion());
+                if (Objects.nonNull(dto)){
+                    template.header(GrayHolder.LABEL_KEY, dto.getLabel());
+                    template.header(GrayHolder.VERSION_KEY, dto.getVersion());
+                }
             }
         };
+    }
+    @Bean
+    @ConditionalOnMissingBean
+    public HttpMessageConverters messageConverters(ObjectProvider<HttpMessageConverter<?>> converters) {
+        return new HttpMessageConverters(converters.orderedStream().collect(Collectors.toList()));
     }
 
 }

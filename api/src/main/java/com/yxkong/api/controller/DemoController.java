@@ -1,6 +1,6 @@
 package com.yxkong.api.controller;
 
-import com.yxkong.api.feginclient.DemoServiceFeginClient;
+import com.yxkong.api.feignclient.DemoServiceFeignClient;
 import com.yxkong.common.dto.ResultBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +25,7 @@ public class DemoController {
     private String version;
 
     @Autowired
-    private DemoServiceFeginClient demoServiceFeginClient;
+    private DemoServiceFeignClient demoServiceFeginClient;
     @Autowired
     private RestTemplate restTemplate;
 

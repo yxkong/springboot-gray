@@ -14,7 +14,7 @@ import java.util.Map;
  * @Date: 2021/5/19 9:40 上午
  * @version: 1.0
  */
-public class FastJsonUtils {
+public class JsonUtils {
     private static final SerializeConfig config;
 
     static {

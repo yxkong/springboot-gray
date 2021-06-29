@@ -1,15 +1,14 @@
 package com.yxkong.api.task;
 
-import com.yxkong.api.feginclient.DemoServiceFeginClient;
+import com.yxkong.api.feignclient.DemoServiceFeignClient;
 import com.yxkong.common.dto.ResultBean;
 import com.yxkong.common.plugin.context.SecurityContextHolder;
 import com.yxkong.common.plugin.context.SecurityDTO;
-import com.yxkong.common.utils.FastJsonUtils;
+import com.yxkong.common.utils.JsonUtils;
 import com.yxkong.lb.holder.GrayHolder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
@@ -25,7 +24,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 public class ScheduleTask {
 
     @Autowired
-    private DemoServiceFeginClient demoServiceFeginClient;
+    private DemoServiceFeignClient demoServiceFeginClient;
     @Autowired
     private RestTemplate restTemplate;
 
@@ -35,7 +34,7 @@ public class ScheduleTask {
     /**
      * 多线程灰度环境
      */
-    @Scheduled(cron = "0/30 * * * * ?")
+    //@Scheduled(cron = "0/30 * * * * ?")
     private void grayTasks() {
         log.info("grayTasks init");
         SecurityContextHolder.initSecurityDTO("gray","2.0");
@@ -53,7 +52,7 @@ public class ScheduleTask {
     /**
      * 多线程非灰环境，只能测试一个
      */
-    @Scheduled(cron = "0/30 * * * * ?")
+    //@Scheduled(cron = "0/30 * * * * ?")
     private void normalTasks() {
         log.info("normalTasks init");
         SecurityContextHolder.initSecurityDTO(null,null);
@@ -73,7 +72,7 @@ public class ScheduleTask {
                 final SecurityDTO dto = SecurityContextHolder.getSecurityDTO();
                 GrayHolder.initHystrixRequestContext(dto.getLabel(),dto.getVersion());
                 ResultBean resultBean = demoServiceFeginClient.hello();
-                log.info(FastJsonUtils.toJson(resultBean));
+                log.info(JsonUtils.toJson(resultBean));
             }catch (Exception e){
                 log.error("Task",e);
             }finally {
@@ -94,7 +93,7 @@ public class ScheduleTask {
                 GrayHolder.initHystrixRequestContext(dto.getLabel(),dto.getVersion());
                 ResponseEntity<ResultBean> entity = restTemplate.getForEntity("http://demo-service/demo/hello", ResultBean.class);
                 ResultBean resultBean = entity.getBody();
-                log.warn(FastJsonUtils.toJson(resultBean));
+                log.warn(JsonUtils.toJson(resultBean));
             }catch (Exception e){
                 log.error("Task1",e);
             }finally {

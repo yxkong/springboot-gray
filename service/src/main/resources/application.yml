@@ -1,10 +1,5 @@
 server:
   port: 9012
-spring :
-  profiles:
-    active: dev
-  application:
-    name: demo-service
   tomcat:
     uri-encoding: UTF-8
     accept-count: 100
@@ -17,7 +12,11 @@ spring :
     enabled: true
   # 开启优雅停机kill -2 可以优雅停机
   shutdown: graceful
-
+spring :
+  profiles:
+    active: dev
+  application:
+    name: demo-service
 yxkong:
   http:
     trace:

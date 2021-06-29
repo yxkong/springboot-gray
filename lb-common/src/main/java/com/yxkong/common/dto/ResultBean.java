@@ -1,8 +1,11 @@
 package com.yxkong.common.dto;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.yxkong.common.exception.ParamsRuntimeExeception;
 import com.yxkong.common.enums.ResultStatusEnum;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -14,15 +17,20 @@ import java.util.Objects;
  * @Date: 2021/4/5 8:28 下午
  * @version: 1.0
  */
+@Schema(name = "公共包装体")
 public class ResultBean<T> implements Serializable {
 
 	private static final long serialVersionUID = -7602280271453240278L;
+	@Schema(name = "返回信息")
 	private String message ;
+	@Schema(name = "返回状态，1 成功，0 失败，")
 	private String status ;
+	@Schema(name = "返回数据体")
 	private T data;
 	/**
 	 * 请求返回时间
 	 */
+	@Schema(name = "返回时间戳")
 	private Long timestamp ;
 
 	public ResultBean() {
@@ -35,6 +43,13 @@ public class ResultBean<T> implements Serializable {
 		this.timestamp = builder.timestamp;
 	}
 
+	@JsonIgnore
+	public boolean isSucc(){
+		if (Objects.nonNull(status) && ResultStatusEnum.SUCCESS.getStatus().equals(status)){
+			return true;
+		}
+		return false;
+	}
 	public String getMessage() {
 		return message;
 	}

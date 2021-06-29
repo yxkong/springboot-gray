@@ -5,13 +5,9 @@ import com.netflix.loadbalancer.AbstractLoadBalancerRule;
 import com.netflix.loadbalancer.ILoadBalancer;
 import com.netflix.loadbalancer.Server;
 import com.netflix.niws.loadbalancer.DiscoveryEnabledServer;
-import com.yxkong.common.utils.ApplicationContextHolder;
-import com.yxkong.lb.configuration.EurekaMetadata;
 import com.yxkong.lb.holder.GrayHolder;
-import javafx.util.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.Map;

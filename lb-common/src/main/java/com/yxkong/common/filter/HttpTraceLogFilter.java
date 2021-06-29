@@ -1,7 +1,7 @@
 package com.yxkong.common.filter;
 
 import com.google.common.collect.Sets;
-import com.yxkong.common.utils.FastJsonUtils;
+import com.yxkong.common.utils.JsonUtils;
 import com.yxkong.common.utils.WebUtil;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.apache.commons.codec.Charsets;
@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.Ordered;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.util.StopWatch;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.ContentCachingRequestWrapper;
@@ -45,6 +44,7 @@ public class HttpTraceLogFilter extends OncePerRequestFilter implements Ordered 
             "gif",
             "configure",
             "v2/api-docs",
+            "/v3/api-docs",
             "swagger",
             "swagger-resources",
             "csrf",
@@ -115,7 +115,7 @@ public class HttpTraceLogFilter extends OncePerRequestFilter implements Ordered 
             traceLog.setStatus(status);
             traceLog.setRequestBody(getRequestBody(request));
             traceLog.setResponseBody(getResponseBody(response));
-            log.info("Http trace log: {}", FastJsonUtils.toJson(traceLog));
+            log.info("Http trace log: {}", JsonUtils.toJson(traceLog));
             updateResponse(response);
         }
     }

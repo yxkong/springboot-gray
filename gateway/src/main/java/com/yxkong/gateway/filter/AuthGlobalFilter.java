@@ -1,9 +1,15 @@
 package com.yxkong.gateway.filter;
 
 import com.yxkong.common.constant.HeaderConstant;
+import com.yxkong.common.dto.LoginInfo;
+import com.yxkong.common.dto.ResultBean;
 import com.yxkong.common.enums.OrderEnum;
+import com.yxkong.common.utils.JsonUtils;
 import com.yxkong.common.utils.WebUtil;
 import com.yxkong.gateway.configuration.AuthProperties;
+import com.yxkong.gateway.feignclient.ServiceFeignClient;
+import com.yxkong.lb.holder.GrayHolder;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
@@ -11,6 +17,7 @@ import org.springframework.core.Ordered;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
@@ -20,9 +27,11 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import javax.annotation.Resource;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 
 /**
  * 权限拦截
@@ -31,6 +40,7 @@ import java.nio.charset.StandardCharsets;
  * @version: 1.0
  */
 @Component
+@Slf4j
 public class AuthGlobalFilter implements GlobalFilter, Ordered {
     byte[] tokenNull = "{\"status\":\"1008\",\"message\":\"token无效,请重新登录\"}".getBytes(StandardCharsets.UTF_8);
     byte[] tokenError = "{\"status\":\"0\",\"message\":\"鉴权异常，请稍后再试!\"}".getBytes(StandardCharsets.UTF_8);
@@ -41,6 +51,10 @@ public class AuthGlobalFilter implements GlobalFilter, Ordered {
     private static final String MAX_AGE = "18000L";
     @Autowired
     private AuthProperties authProperties;
+
+    @Resource
+    private ServiceFeignClient serviceFeignClient;
+
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
 
@@ -79,6 +93,10 @@ public class AuthGlobalFilter implements GlobalFilter, Ordered {
      */
     private String getLoginInfo(String token) {
         String loginInfo = getUserInfo(token);
+        log.info("用户信息{} ",loginInfo);
+        if (Objects.isNull(loginInfo)){
+            return null;
+        }
         try{
             loginInfo = URLEncoder.encode(loginInfo,StandardCharsets.UTF_8.name());
         }catch (UnsupportedEncodingException e){
@@ -87,13 +105,12 @@ public class AuthGlobalFilter implements GlobalFilter, Ordered {
         return loginInfo;
     }
     private String getUserInfo(String token){
-        if("abc".equals(token)){
-            return "{\"userId\":\"1\",\"name\":\"yxkong\",\"mobile\":\"15600000269\"}";
-        }else if("bcd".equals(token)){
-            return "{\"userId\":\"901\",\"name\":\"鱼翔空\",\"mobile\":\"15600000279\"}";
-        }else {
-            return "{\"userId\":\"901\",\"name\":\"火星\",\"mobile\":\"15600000270\"}";
+        GrayHolder.initHystrixRequestContext(null,null);
+        final ResultBean<LoginInfo> resultBean = serviceFeignClient.getLoginInfo(token);
+        if (resultBean.isSucc() && Objects.nonNull(resultBean.getData())){
+            return JsonUtils.toJson(resultBean.getData());
         }
+        return null;
     }
 
     /**
@@ -106,6 +123,7 @@ public class AuthGlobalFilter implements GlobalFilter, Ordered {
         ServerHttpResponse serverHttpResponse = exchange.getResponse();
         serverHttpResponse.setStatusCode(HttpStatus.OK);
         byte[] response = type ? tokenNull : tokenError;
+        exchange.getResponse().getHeaders().setContentType(MediaType.APPLICATION_JSON);
         DataBuffer buffer = exchange.getResponse().bufferFactory().wrap(response);
         return exchange.getResponse().writeWith(Flux.just(buffer));
     }

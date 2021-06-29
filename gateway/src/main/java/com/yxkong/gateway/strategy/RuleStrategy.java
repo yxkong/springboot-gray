@@ -7,8 +7,6 @@
 package com.yxkong.gateway.strategy;
 
 import com.yxkong.gateway.dto.LoadBalancerRule;
-import com.yxkong.gateway.dto.LoginInfo;
-import org.springframework.core.Ordered;
 
 import java.util.Map;
 

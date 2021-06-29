@@ -104,3 +104,29 @@ curl  'http://127.0.0.1:9000/api/demo/hello' --header 'token: abc'  --header 'Co
 
 
 ```
+2021-06-27 更新日志
+- 添加线程池消费任务的样例；
+- 添加非web请求，模拟定时任务或者kafka异步任务处理的demo；
+
+
+2021-06-29 更新日志
+- 实现用户数据从库中查询，并模拟登录，使用jwt生成token（未做安全性优化，最好jwt内容md5作为key，然后和jwt缓存到redis中）
+- 实现灰度规则数据库配置
+- 使用aviator 替代策略模式实现规则处理；
+可用规则字典元数据：
+  - userId 用户id  t_account 中的id
+  - age  年龄
+  - loginSource 登录来源
+  - mobile 手机号
+  - registerTime 注册时间 
+  - mobileMod 手机号取模（%10）
+  - userIdMod userId取模（%10）
+  
+#### 灰度规则使用说明
+- t_gray_rule 中只有一条有效数据，否则取id最新的一条；
+- rule 为aviator 表达式 返回true或false，异常认为是false
+(string.startsWith('9,0',mobileMod) && userId>=901 && registerTime>'2021-06-01 00:00:00')
+  以9或0为结尾的手机号 且userId大于等于901， 注册时间大于2021-06-01 00:00:00才是灰度用户
+  这块可以灵活配置
+  
+  

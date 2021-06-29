@@ -1,6 +1,8 @@
 package com.yxkong.gateway;
 
 import com.googlecode.aviator.AviatorEvaluator;
+import com.sun.org.apache.xpath.internal.operations.Bool;
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.text.SimpleDateFormat;
@@ -27,8 +29,8 @@ public class RuleTest {
         map.put("sex",1);
         map.put("age",28);
         String expression = "(string.startsWith('9,0',mobileTail) && userId>=901 && registerTime>'2021-06-25 00:00:00')";
-        final Object o = AviatorEvaluator.execute(expression, map);
-        System.out.println(o);
+        Boolean flag = (Boolean) AviatorEvaluator.execute(expression, map);
+        Assert.assertTrue("规则验证通过",flag);
 
     }
 

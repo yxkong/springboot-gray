@@ -23,6 +23,11 @@ import org.springframework.context.annotation.Import;
 @RibbonClients(defaultConfiguration = LoadBalanceAutoConfiguration.class)
 public class ServiceStarter {
     public static void main(String[] args) {
-        SpringApplication.run(ServiceStarter.class,args);
+        try {
+            new SpringApplication(ServiceStarter.class).run(args);
+            //SpringApplication.run(ServiceStarter.class,args);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

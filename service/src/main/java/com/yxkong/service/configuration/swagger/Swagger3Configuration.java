@@ -28,14 +28,13 @@ import java.util.List;
  */
 @EnableOpenApi
 @Configuration
-public class Swagger3Configuration implements WebMvcConfigurer {
+public class Swagger3Configuration  {
 
     private final SwaggerProperties swaggerProperties;
 
     public Swagger3Configuration(SwaggerProperties swaggerProperties) {
         this.swaggerProperties = swaggerProperties;
     }
-
     @Bean
     public Docket createRestApi() {
         /**
@@ -108,22 +107,5 @@ public class Swagger3Configuration implements WebMvcConfigurer {
         return responseList;
     }
 
-    @Override
-    public void addInterceptors(InterceptorRegistry registry) {
-        try {
-            Field registrationsField = FieldUtils.getField(InterceptorRegistry.class, "registrations", true);
-            List<InterceptorRegistration> registrations = (List<InterceptorRegistration>) ReflectionUtils.getField(registrationsField, registry);
-            if (registrations != null) {
-                for (InterceptorRegistration interceptorRegistration : registrations) {
-                    interceptorRegistration
-                            .excludePathPatterns("/swagger**/**")
-                            .excludePathPatterns("/webjars/**")
-                            .excludePathPatterns("/v3/**")
-                            .excludePathPatterns("/doc.html");
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+
 }

@@ -34,7 +34,8 @@ eureka:
     #ip-address: 127.0.0.1
     #表示使用IP进行配置
     prefer-ip-address: true
-    instance-id: ${spring.cloud.client.ip-address}:${spring.application.name}:${server.port}
+    #instance-id: ${spring.cloud.client.ip-address}:${spring.application.name}:${server.port}
+    instance-id: 127.0.0.1:${spring.application.name}:${server.port}
     #租期更新时间间隔（默认30秒）
     lease-renewal-interval-in-seconds: 10
     #租期到期时间（默认90秒）
@@ -49,7 +50,7 @@ swagger:
   description: '灰度service'
   contactName: 'yxkong'
   contactUrl: http://www.5ycode.com
-  contactEmail: xxx
+  contactEmail: 5ycode@sina.com
   serviceUrl: http://localhost:${server.port}
 
 datasource:
@@ -73,3 +74,23 @@ datasource:
     testOnReturn: false
     poolPreparedStatements: true
     maxOpenPreparedStatements: 20
+
+#设置当前工程为服务提供者
+dubbo:
+  server: true
+  enabled: true
+  #设置注册中心
+  registry:
+    address: zookeeper://127.0.0.1:2181
+    #端口号可以写在address中，也可以单独写。实质是从address中获取的port是null，后面设置的port覆盖了null
+    #port: 2181
+    # 指定注册到zk上超时时间，ms
+    timeout: 10000
+    parameters:
+      version: null
+      lable: null
+  protocol:
+    name: dubbo
+    port: 20880
+  scan:
+    base-packages: com.yxkong.dubbo.service

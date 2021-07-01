@@ -4,7 +4,7 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 import springfox.documentation.service.RequestParameter;
-import springfox.documentation.service.ResponseMessage;
+import springfox.documentation.service.Response;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -61,6 +61,6 @@ public class SwaggerProperties {
     /**
      * 添加Response head参数
      */
-    private Map<String, ResponseMessage> globleResponseMessage = new LinkedHashMap<>();
+    private Map<String, Response> globleResponseMessage = new LinkedHashMap<>();
 
 }

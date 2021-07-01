@@ -2,17 +2,22 @@ package com.yxkong.lb.configuration;
 
 import com.yxkong.common.plugin.context.SecurityContextHolder;
 import com.yxkong.lb.holder.GrayHolder;
+import org.apache.commons.lang.reflect.FieldUtils;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.util.ReflectionUtils;
 import org.springframework.web.server.WebHandler;
 import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import javax.servlet.Servlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.lang.reflect.Field;
+import java.util.List;
 
 /**
  * @Author: yxkong
@@ -32,6 +37,21 @@ public class ServletAutoConfiguration {
         @Override
         public void addInterceptors(InterceptorRegistry registry) {
             registry.addInterceptor(interceptor()).addPathPatterns("/**");
+            try {
+                Field registrationsField = FieldUtils.getField(InterceptorRegistry.class, "registrations", true);
+                List<InterceptorRegistration> registrations = (List<InterceptorRegistration>) ReflectionUtils.getField(registrationsField, registry);
+                if (registrations != null) {
+                    for (InterceptorRegistration interceptorRegistration : registrations) {
+                        interceptorRegistration
+                                .excludePathPatterns("/swagger**/**")
+                                .excludePathPatterns("/webjars/**")
+                                .excludePathPatterns("/v3/**")
+                                .excludePathPatterns("/doc.html");
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
         private HandlerInterceptor interceptor() {

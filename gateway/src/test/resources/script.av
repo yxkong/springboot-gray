@@ -1,0 +1,17 @@
+str = "";
+if (age <=1 ){
+  str = "婴儿";
+} elsif (age>1 && age<=6) {
+   str = "儿童";
+} elsif (age>6 && age<=17) {
+  str = "青少年";
+} elsif (age>18 && age<=40){
+  str = "青年";
+} elsif (age>40 && age<=48){
+  str = "壮年";
+} elsif (age>48 && age<=65){
+  str = "中年";
+} elsif (age>65){
+  str = "老年";
+}
+return str="#{name}处在#{str}期";

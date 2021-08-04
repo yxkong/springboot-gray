@@ -1,5 +1,6 @@
 package com.yxkong.common.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,17 +16,8 @@ import java.util.Date;
 @Data
 @Builder
 @NoArgsConstructor
+@AllArgsConstructor
 public class LoginInfo implements Serializable {
-    public LoginInfo(Long userId, String mobile, String nickName, Date loginTime, String loginSource, int age, Date registerTime) {
-        this.userId = userId;
-        this.mobile = mobile;
-        this.nickName = nickName;
-        this.loginTime = loginTime;
-        this.loginSource = loginSource;
-        this.age = age;
-        this.registerTime = registerTime;
-    }
-
     private Long userId;
     private String mobile;
     private String nickName;

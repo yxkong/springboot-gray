@@ -7,8 +7,10 @@ package com.yxkong.common.enums;
  * @version: 1.0
  */
 public enum OrderEnum {
+    TRACING(-1,"链路"),
     AUTH(-100,"鉴权"),
     GRAY(-99,"灰度");
+
     private int order;
     private String desc;
 

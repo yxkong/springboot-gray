@@ -1,5 +1,12 @@
 server:
   port: 9012
+  servlet:
+    session:
+      timeout: 3600
+    encoding: # 解决http请求编码问题
+      force: true
+      charset: UTF-8
+      enabled: true
   tomcat:
     uri-encoding: UTF-8
     accept-count: 100
@@ -17,7 +24,8 @@ spring :
     active: dev
   application:
     name: demo-service
-yxkong:
   http:
-    trace:
-      enabled: true
+    encoding-charset: UTF-8
+yxkong:
+  tracing:
+    enabled: true

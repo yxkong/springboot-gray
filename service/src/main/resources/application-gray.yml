@@ -27,7 +27,7 @@ eureka:
       #开启健康检查
       enabled: true
     service-url:
-      defaultZone: http://127.0.0.1:8765/eureka/
+      defaultZone: http://10.255.200.214:8765/eureka/
   instance:
     hostname: ${spring.application.name}
     #指定本节点的IP
@@ -63,3 +63,33 @@ datasource:
     testOnReturn: false
     poolPreparedStatements: true
     maxOpenPreparedStatements: 20
+
+spring:
+  kafka:
+    bootstrap-servers: 10.255.200.214:9092
+    consumer:
+      group-id: ${spring.application.name}_consumer
+      enable-auto-commit: true
+      auto-commit-interval: 100
+      auto-offset-reset: latest  #earliest
+      max-poll-records: 100
+    producer:
+      client-id: ${spring.application.name}_producer
+      retries: 3
+      batch-size: 1048576
+      buffer-memory: 6291456
+      acks: all
+      compression-type: gzip
+    listener:
+      concurrency: 5
+  sleuth:
+    sampler:
+      probability: 1.0
+  zipkin:
+    compression:
+      enabled: true
+    sender:
+      type: kafka
+    message-timeout: 10
+    service:
+      name: ${spring.application.name}

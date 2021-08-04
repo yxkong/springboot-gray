@@ -1,5 +1,12 @@
 server:
   port: 9001
+  servlet:
+    session:
+      timeout: 3600
+    encoding: # 解决http请求编码问题
+      force: true
+      charset: UTF-8
+      enabled: true
 spring :
   profiles:
     active: dev
@@ -19,6 +26,5 @@ spring :
   shutdown: graceful
 
 yxkong:
-  http:
-    trace:
-      enabled: true
+  tracing:
+    enabled: true

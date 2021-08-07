@@ -1,10 +1,15 @@
 package com.yxkong.gateway.filter;
 
 import brave.Span;
+import brave.Tracer;
 import brave.Tracing;
+import com.alibaba.fastjson.JSONObject;
 import com.yxkong.common.configuration.sleuth.filter.SkipHeaderEnum;
+import com.yxkong.common.dto.ResultBean;
+import com.yxkong.common.utils.JsonUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.reactivestreams.Publisher;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.http.server.reactive.ServerHttpResponse;
@@ -30,6 +35,8 @@ import java.util.stream.Collectors;
 @Component
 @Slf4j
 public class GatewayTracingFilter implements GlobalFilter, Ordered {
+    @Autowired
+    Tracer tracer;
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         exchange.getRequest().getHeaders().forEach((k,v)->{
@@ -56,8 +63,8 @@ public class GatewayTracingFilter implements GlobalFilter, Ordered {
                         //释放掉内存
                         DataBufferUtils.release(dataBuffer);
                         String result = new String(content, StandardCharsets.UTF_8);
-                        log.info(result);
-                        putSpan("response.content", result);
+
+                        putResult(result);
                         return bufferFactory.wrap(result.getBytes(StandardCharsets.UTF_8));
                     }));
                 }
@@ -66,7 +73,21 @@ public class GatewayTracingFilter implements GlobalFilter, Ordered {
             }
         };
         // replace response with decorator
-        return chain.filter(exchange);
+        return chain.filter(exchange.mutate().response(decoratedResponse).build());
+    }
+    private void putResult(String result){
+        log.info(result);
+        putSpan("response.content", result);
+        JSONObject jsonObject = JsonUtils.jsonObject(result);
+        if (jsonObject.containsKey(ResultBean.STATUS)){
+            putSpan("response.status", jsonObject.getString(ResultBean.STATUS));
+        }
+        if (jsonObject.containsKey(ResultBean.MESSAGE)){
+            putSpan("response.message", jsonObject.getString(ResultBean.MESSAGE));
+        }
+        if (jsonObject.containsKey(ResultBean.TIMESTAMP)){
+            putSpan("response.message", jsonObject.getString(ResultBean.TIMESTAMP));
+        }
     }
 
     @Override
@@ -74,10 +95,7 @@ public class GatewayTracingFilter implements GlobalFilter, Ordered {
         return  OrderEnum.TRACING.getOrder();
     }
     private void putSpan( String key, String value) {
-        Span span = getSpan();
-        if ( Objects.nonNull(span) && Objects.nonNull(value)) {
-            span.tag(key, value);
-        }
+        tracer.currentSpan().tag(key, value);
     }
     private Span getSpan(){
         Span span = null;

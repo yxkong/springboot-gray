@@ -12,6 +12,11 @@ server:
   # 开启优雅停机kill -2 或者控制台ctrl c可以优雅停机
   shutdown: graceful
 logging:
+  level:
+    root: info
+    org.springframework.cloud.sleuth: debug
+    org.springframework.cloud.zipkin: debug
+    brave: debug
   config: classpath:log4j2/log4j2-dev.xml
 eureka:
   server:
@@ -35,7 +40,7 @@ eureka:
     prefer-ip-address: true
     instance-id: ${spring.cloud.client.ip-address}:${spring.application.name}:${server.port}
     #租期更新时间间隔（默认30秒）
-    lease-renewal-interval-in-seconds: 10
+    lease-renewal-interval-in-seconds: 5
     #租期到期时间（默认90秒）
     lease-expiration-duration-in-seconds: 10
     metadata-map:

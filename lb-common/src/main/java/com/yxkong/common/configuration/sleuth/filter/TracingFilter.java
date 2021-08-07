@@ -2,7 +2,9 @@ package com.yxkong.common.configuration.sleuth.filter;
 
 import brave.Span;
 import brave.Tracing;
+import com.alibaba.fastjson.JSONObject;
 import com.yxkong.common.dto.ResultBean;
+import com.yxkong.common.utils.JsonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -86,20 +88,8 @@ public class TracingFilter extends OncePerRequestFilter {
      * @param responseWrapper
      */
     private void after(ContentCachingRequestWrapper requestWrapper, ContentCachingResponseWrapper responseWrapper) throws IOException{
-        String status = null;
-        String message = null;
 
         try {
-            status = ResultBean.STATUS.get();
-            message = ResultBean.MESSAGE.get();
-            ResultBean.remove();
-
-            if (Objects.nonNull(status)){
-                putSpan("response.status", status);
-            }
-            if (Objects.nonNull(message)){
-                putSpan("response.message", message);
-            }
             String requestPayload = null;
             String responsePayload = null;
             try {
@@ -120,10 +110,19 @@ public class TracingFilter extends OncePerRequestFilter {
             if (Objects.nonNull(characterEncoding)) {
                 putSpan("response.characterEncoding", characterEncoding);
             }
+
+            JSONObject jsonObject = JsonUtils.jsonObject(responsePayload);
+            if (jsonObject.containsKey(ResultBean.STATUS)){
+                putSpan("response.status", jsonObject.getString(ResultBean.STATUS));
+            }
+            if (jsonObject.containsKey(ResultBean.MESSAGE)){
+                putSpan("response.message", jsonObject.getString(ResultBean.MESSAGE));
+            }
+            if (jsonObject.containsKey(ResultBean.TIMESTAMP)){
+                putSpan("response.message", jsonObject.getString(ResultBean.TIMESTAMP));
+            }
         } catch (Exception e) {
         }
-
-
     }
     private String getPayLoad(byte[] buf, String characterEncoding) {
         String payload = "[unknown]";

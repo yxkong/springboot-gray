@@ -19,8 +19,9 @@ import java.util.Objects;
  */
 @Schema(name = "公共包装体")
 public class ResultBean<T> implements Serializable {
-	public static ThreadLocal<String> STATUS = new ThreadLocal<>();
-	public static ThreadLocal<String> MESSAGE = new ThreadLocal<>();
+	public static final String STATUS = "status";
+	public static final String MESSAGE = "message";
+	public static final String TIMESTAMP = "timestamp";
 	private static final long serialVersionUID = -7602280271453240278L;
 	@Schema(name = "返回信息")
 	private String message ;
@@ -42,8 +43,6 @@ public class ResultBean<T> implements Serializable {
 		this.status = builder.status;
 		this.data = (T)builder.data;
 		this.timestamp = builder.timestamp;
-		ResultBean.STATUS.set(status);
-		ResultBean.MESSAGE.set(message);
 	}
 
 	@JsonIgnore
@@ -52,11 +51,6 @@ public class ResultBean<T> implements Serializable {
 			return true;
 		}
 		return false;
-	}
-	@JsonIgnore
-	public static void remove() {
-		STATUS.remove();
-		MESSAGE.remove();
 	}
 	public String getMessage() {
 		return message;

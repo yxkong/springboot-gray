@@ -81,6 +81,7 @@ public class JsonUtils {
     public static <T> T fromJson(String json, Class<T> clazz) {
         return JSON.parseObject(json, clazz);
     }
+
     /**
      * 按类型转化
      * @param json
@@ -158,6 +159,9 @@ public class JsonUtils {
      */
     public static Map<String,Object> stringToCollect(String json) {
         return JSONObject.parseObject(json);
+    }
+    public static JSONObject jsonObject(String text){
+        return JSONObject.parseObject(text);
     }
 
 }

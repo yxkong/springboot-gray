@@ -24,8 +24,6 @@ spring :
     active: dev
   application:
     name: demo-service
-  http:
-    encoding-charset: UTF-8
 yxkong:
   tracing:
     enabled: true

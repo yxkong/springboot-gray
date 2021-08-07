@@ -5,6 +5,8 @@ spring:
     active: dev   # 指定启动环境  
   application:
     name: demo-gateway
+  sleuth:
+    reactor: true
 #management:
 #  endpoint:
 #    health:

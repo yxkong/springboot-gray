@@ -13,12 +13,12 @@
 #### gateway 网关
 - 基于bootstrap.yml 配置的网关路由，后续可以直接使用配置中心替换
 - AuthGlobalFilter 实现权限的拦截
-- GrayGlobalFilter 实现打灰度标签的功能，基于策略模式实现，配置策略只需要前缀名称即可（后续使用表达式，更方便）
+_- GrayGlobalFilter 实现打灰度标签的功能，基于策略模式实现，配置策略只需要前缀名称即可（后续使用表达式，更方便）
     - RuleStrategy 规则策略接口
     - EqRuleStrategy 等于策略实现
     - Ge/GteRuleStrategy 大于/大于等于策略实现
     - Le/LteRuleStrategy 小于/小于等于策略实现
-    - Mod10RuleStrategy 取模策略实现
+    - Mod10RuleStrategy 取模策略实现_
 ```
 #启动项目
 java -jar  gateway-1.0.jar

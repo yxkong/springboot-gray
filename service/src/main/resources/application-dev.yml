@@ -1,3 +1,4 @@
+
 server:
   port: 9012
   tomcat:
@@ -13,6 +14,11 @@ server:
   # 开启优雅停机kill -2 可以优雅停机
   shutdown: graceful
 logging:
+  level:
+    root: info
+    org.springframework.cloud.sleuth: debug
+    org.springframework.cloud.zipkin: debug
+    brave: debug
   config: classpath:log4j2/log4j2-dev.xml
 eureka:
   server:
@@ -57,8 +63,8 @@ datasource:
     # 使用druid数据源
     type: com.alibaba.druid.pool.DruidDataSource
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://127.0.0.1:3306/gray_user?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull&serverTimezone=GMT%2B8
-    username: root
+    url: jdbc:mysql://10.255.200.214.:3306/gray_user?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull&serverTimezone=GMT%2B8
+    username: dev
     password: 123456
     filters: stat
     maxActive: 10

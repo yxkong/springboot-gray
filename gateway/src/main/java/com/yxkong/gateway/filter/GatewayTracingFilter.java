@@ -86,7 +86,7 @@ public class GatewayTracingFilter implements GlobalFilter, Ordered {
             putSpan("response.message", jsonObject.getString(ResultBean.MESSAGE));
         }
         if (jsonObject.containsKey(ResultBean.TIMESTAMP)){
-            putSpan("response.message", jsonObject.getString(ResultBean.TIMESTAMP));
+            putSpan("response.timestamp", jsonObject.getString(ResultBean.TIMESTAMP));
         }
     }
 
